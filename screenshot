@@ -3,7 +3,7 @@
 # Check capabilities
 readonly REQUIRES=("shutter" "lftp" "zenity" "curl" "xclip" "jq" "notify-send")
 
-for i in "$REQUIRES[@]}"
+for i in "${REQUIRES[@]}"
 do
     if ! type $i > /dev/null; then
         abort 1 "${i} is not installed! Please install it and try again"
