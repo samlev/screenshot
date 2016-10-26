@@ -10,6 +10,7 @@ Pretty basic script for uploading screenshots on ubuntu. Options are: FTP, imgur
 * [`curl`](https://curl.haxx.se/) - calls URLs (used for uploading to imgur)
 * [`jq`](https://stedolan.github.io/jq/) - sed for json data (used to read responses from imgur)
 * [`xclip`](https://linux.die.net/man/1/xclip) - used to add things to the clipboard
+* [`notify-send`](https://developer.gnome.org/libnotify/) - used to send desktop notifications (libnotify)
 
 All of these should be available through `apt` or `yum`. Note that I haven't tested any of this on anything other than Ubuntu 16.04, but they all work when configured correctly.
 
