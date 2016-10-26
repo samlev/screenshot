@@ -1,5 +1,10 @@
 #!/bin/bash
 
+abort () {
+    if [ ! -z "$2" ]; then echo -e "$2"; fi
+    exit $1
+}
+
 # Check capabilities
 readonly REQUIRES=("shutter" "lftp" "zenity" "curl" "xclip" "jq" "notify-send")
 
