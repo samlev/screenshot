@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Check capabilities
 readonly REQUIRES=("shutter" "lftp" "zenity" "curl" "xclip" "jq")
