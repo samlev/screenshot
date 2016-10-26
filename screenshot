@@ -1,0 +1,71 @@
+#!/bin/sh
+
+# Check capabilities
+readonly REQUIRES=("shutter" "lftp" "zenity" "curl" "xclip" "jq")
+
+for i in "$REQUIRES[@]}"
+do:
+    if ! type $i > /dev/null; then
+        abort 1 "${i} is not installed! Please install it and try again"
+    fi
+done
+
+# Local image settings
+readonly LOCAL_PICTURES=~/Pictures
+
+# FTP settings
+readonly FTP_HOST=example.com
+readonly FTP_USER=username
+readonly FTP_PASS=password
+readonly FTP_PATH=/
+readonly FTP_URL="http://example.com/%s"
+
+# Imgur settings
+readonly IMGUR_AUTH="Generate an OAuth client ID from https://api.imgur.com/oauth2/addclient"
+
+PicturesUploadImage () {
+    mv $1 ${LOCAL_PICTURES}/${file}
+    realpath ${LOCAL_PICTURES}/${file} | tr -d '\n'
+}
+
+FtpUploadImage () {
+    lftp -c "open -u ${FTP_USER},${FTP_PASS} ${FTP_HOST}; put -O ${FTP_PATH} ${1}"
+    printf ${FTP_URL} ${file}
+}
+
+ImgurUploadImage () {
+    curl -s -F "image=@$1"  https://api.imgur.com/3/image -H "Authorization: Client-ID ${IMGUR_AUTH}" | jq '.data.link' -r
+}
+
+# Get sane file names
+file=$(mktemp $(date +%Y-%m-%d_%H%M%S)_${USER}_XXXXXXXX.png)
+tmpname=/tmp/${file}
+
+# ASAP: get that image we want to grab. 
+shutter -C -e -s -o ${tmpname} 2>/dev/null
+
+# and now... later... we work out if we need to do other stuff... :)
+
+# Find out where we want to upload it
+uploadto=$(zenity --entry --title="Upload screenshot" --text="Where do you want to upload?" --entry-text "Imgur" "Ftp" "Pictures" "Clipboard")
+
+case $uploadto in
+    Imgur)
+        ImgurUploadImage ${tmpname} | xclip -selection c
+        notify-send "Uploaded to Imgur!"
+        ;;
+    Ftp)
+        FtpUploadImage ${tmpname} | xclip -selection c
+        notify-send "Uploaded to FTP!"
+        ;;
+    Pictures)
+        PicturesUploadImage ${tmpname} | xclip -selection c
+        notify-send "Moved to Pictures!"
+        ;;
+    Clipboard)
+        xclip -selection clipboard -t image/png -i ${tmpname}
+        notify-send "Copied to clipboard!"
+        ;;
+esac
+
+
